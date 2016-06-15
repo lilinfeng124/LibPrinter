@@ -1,0 +1,29 @@
+﻿#include "CDatFile.h"
+#include "CASCIIFile.h"
+#include "CBINFile.h"
+
+CDatFile::CDatFile ()
+{
+
+}
+
+CDatFile::~CDatFile()
+{
+
+}
+
+
+bool CDatFile::ReadDatFile(const QString& strFile,unsigned int nACount,
+						   unsigned int nDCount,bool bBin)
+{
+	if (bBin)
+	{
+		CBinFile binFile;
+		return  binFile.ReadBinFile(strFile,nACount,nDCount,m_ChanelDataList);
+	}
+	else
+	{
+		CASCIIFile asciiFile;
+		return  asciiFile.ReadAsciiFile(strFile,nACount,nDCount,m_ChanelDataList);
+	}
+}

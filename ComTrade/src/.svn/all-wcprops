@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/VisualWaveView/!svn/ver/80/ComTrade/src
+END
+CDesFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/VisualWaveView/!svn/ver/80/ComTrade/src/CDesFile.cpp
+END
+CHdrFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/VisualWaveView/!svn/ver/45/ComTrade/src/CHdrFile.cpp
+END
+CComTradeFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/VisualWaveView/!svn/ver/80/ComTrade/src/CComTradeFile.cpp
+END
+CCfgFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/VisualWaveView/!svn/ver/45/ComTrade/src/CCfgFile.cpp
+END
+CFileStruct.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/VisualWaveView/!svn/ver/26/ComTrade/src/CFileStruct.cpp
+END
+CASCIIFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/src/CASCIIFile.cpp
+END
+CBINFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/VisualWaveView/!svn/ver/45/ComTrade/src/CBINFile.cpp
+END
+CDatFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/VisualWaveView/!svn/ver/3/ComTrade/src/CDatFile.cpp
+END

@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/VisualWaveView/!svn/ver/80/ComTrade/include
+END
+CASCIIFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CASCIIFile.h
+END
+CBINFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CBINFile.h
+END
+CDatFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CDatFile.h
+END
+CDesFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CDesFile.h
+END
+CHdrFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CHdrFile.h
+END
+CComTradeFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/VisualWaveView/!svn/ver/80/ComTrade/include/CComTradeFile.h
+END
+CCfgFile.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/VisualWaveView/!svn/ver/45/ComTrade/include/CCfgFile.h
+END
+LibComTrade.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/VisualWaveView/!svn/ver/2/ComTrade/include/LibComTrade.h
+END
+CFileStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/VisualWaveView/!svn/ver/27/ComTrade/include/CFileStruct.h
+END

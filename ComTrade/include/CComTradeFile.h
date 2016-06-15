@@ -1,0 +1,312 @@
+#ifndef _COMTRADEFILE_H_
+#define _COMTRADEFILE_H_
+
+#include "LibComTrade.h"
+#include "CCfgFile.h"
+#include "CDatFile.h"
+#include "CDesFile.h"
+#include "CHdrFile.h"
+
+#include <QFile>
+#include <QString>
+#include <QStringList>
+#include <QMap>
+
+
+//文件格式
+#define COMTRADE91_BINARY	1
+#define COMTRADE91_ASCII	2
+#define COMTRADE99_BINARY	3
+#define COMTRADE99_ASCII	4
+
+//
+#define MAX_BLOCKS			100// 最大波形块数(容量)
+#define MAX_TAGS			2048// 最大开关量数(容量)
+#define MAX_WAVES			2048// 最大波形量数(容量)
+
+//数值显示类型
+#define VAL_RAW			0		// 原始值
+#define VAL_PRIMARY		1		// 一次值
+#define VAL_SECONDARY	2		// 二次值
+
+#ifdef M_PI
+#undef M_PI
+#endif
+
+#define M_PI			3.141592653590
+#define M_SQRT2			1.414213562373
+#define M_SQRT3P2		0.8660254					//二分之根号３
+
+const double PI = 3.1415926535897932384626433832795 ;
+const double SQRT_OF_2 = 1.4142135623730950488016887242097;
+const double PI_TO_ANGLE = 180 / PI ;
+
+//工频
+const double FREQ_WORK = 50.0; 
+const long FREQ_SAMPLE = 12; 
+
+enum PHASE_TYPE
+{
+	PHASE_NULL = 0,
+	PHASE_A = 1,
+	PHASE_B = 2,
+	PHASE_C = 3,
+	PHASE_0 = 4
+};
+
+
+
+class COMTRADE_API CComTradeFile:public QObject
+{
+	Q_OBJECT
+public:
+	CComTradeFile ();
+	~CComTradeFile();
+
+public:
+	bool ReadComTradeFile(const QString& strFile);	//hdr,cfg,dat,mid,des文件中的任意一个
+
+	bool ReadComTradeFileList(const QStringList& fileList);
+
+	QStringList GetErrorList();
+
+private:
+	enum FileType
+	{
+		Hdr,
+		Cfg,
+		Dat,
+		Des,
+		Mid,
+	};
+
+	QString FileNameFromType(const QString& strFile,FileType type);
+
+	//傅里叶变换的到所有的值和时刻
+	bool Fourier(AnalogDataList& dataList,int nBlock);
+
+	//计算时间
+	void TimeMSecond();
+
+	//一次，二次
+	bool IsAInfoPrimary(const CAChanelInfo& aInfo);
+
+	//原始采样->模拟量
+	bool SampleDataToAnalogData(unsigned long nAIndex, 
+		const CChanelSampleData& samData,
+		CAnalogData& aData);
+
+	//原始采样->数字量
+	bool SampleDataToDigitalData(unsigned long nDIndex, 
+		const CChanelSampleData& samData,
+		CDigitalData& dData,
+		bool& bChanged);
+
+	//原始采样值->一次二次值
+	bool TransformData();
+
+	//原始采样值->一次二次模拟量值
+	void TransformAnalogData(CStaticAnalogData& staticAData,
+		AnalogDataList& aDataList,int nBlock,const CAChanelInfo& aInfo);
+
+	//原始采样值->数字量值
+	void TransformDigitalData(DigitalDataList& dDataList, bool bChanged);
+
+	//统计模拟数据的最大最小值
+	void StaticAnalogData(CStaticAnalogData& staticAData,const CAnalogData& aData);
+
+protected:
+	CCfgFile	m_cfgFile;
+	CDatFile	m_datFile;
+	CHdrFile	m_hdrFile;
+	CDatFile	m_midFile;
+	CDesFile	m_desFile;
+
+	QStringList m_ErrorList;
+
+	int			m_nTrigger_ms;			//触发点的毫秒数(当天)
+	int			m_nFrist_ms;			//起点点的毫秒数(当天)相对触发点
+
+	qint64		m_lFirstMicroSecs;		//绝对起点点的毫秒数
+
+	//模拟量
+	typedef QMap<unsigned long,AnalogDataList> TimeAnalogDataMap;
+	TimeAnalogDataMap m_AnalogDataMap; 
+
+	//数字量	
+	typedef QMap<unsigned long,DigitalDataList> TimeDigitalDataMap;
+	TimeDigitalDataMap m_DigitalDataMap;
+
+	//最大值
+	typedef QMap<unsigned int,CStaticAnalogData> AnalogStaticValueMap;
+	AnalogStaticValueMap	m_StaticValueMap;
+
+	//数字通道是否动作
+	bool		m_bDChanelAct;
+	typedef QMap<unsigned int,bool> DigitalChangedMap;
+	DigitalChangedMap	m_DigitalChangedMap;
+
+	//时间序列
+	QList<unsigned long> m_TimeArray;
+
+	//中间数据数字通道是否动作 
+	DigitalChangedMap	m_MidDigitalChangedMap;
+
+	//中间数据采样通道数据Map
+	QMap<unsigned int,CChanelSampleData> m_MidSampleDataMap;
+
+
+/***********************************************************/
+public:
+
+	CComTradeFile &operator=( const CComTradeFile & );
+public:
+	/************************************************************************/
+	/* ComTrade信息                                                               */
+	/************************************************************************/
+	//配置
+	QString			GetRevision();  //版本年号
+	bool			IsDatBin();	//数据文件是否二进制
+	QString			GetSiteName();	//厂站名称
+	QString			GetUnitName();	//装置特征号
+	unsigned int	GetChanelCount(); //通道数量
+	unsigned int	GetACount();	//A通道数量
+	unsigned int	GetDCount();	//D通道数量
+
+	//是否连续采样
+	bool IsContinuous();
+
+	CAChanelInfo    GetAInfoByIndex(unsigned int nIndex);
+
+	CDChanelInfo    GetDInfoByIndex(unsigned int nIndex);
+
+	CAChanelInfo    GetAInfoByName(const QString& strName,bool& bOk);
+
+	CDChanelInfo    GetDInfoByName(const QString& strName,bool& bOk);
+
+	bool	IsAInfoPrimary(unsigned int nIndex);
+
+	AChanelInfoList GetAChanelInfoList();
+
+	DChanelInfoList GetDChanelInfoList();
+
+	double			GetLineFreq();	//线路频率
+	unsigned short  GetNrates();	//采样率块数
+	SampleInfoList  GetSampleInfos();	//采样信息
+	double			GetTimeMult();	//时间比例，正常1.0
+
+	int				GetTotalPointCount();	//总的采样点个数
+	int				GetStartPointByBlock(int nBlock);
+	int				GetSampleCountByBlock(int nBlock);
+	double			GetSampleRateByBlock(int nBlock);
+
+	CExDateTime     GetFirstDataTime();	//第一个采样数据时间
+	CExDateTime     GetTriggeredTime();	//触发时间
+
+	int     GetFirstDataTimeMs();		//第一个采样数据时间毫秒数 = 第一个采样数据时间-触发时间
+	int     GetTriggeredTimeMs();		//触发时间毫秒数 = 0
+	qint64  GetABSFirstDataTimeMs();
+
+	double GetPointTime(unsigned int nPoint); //获取数据点相对起始点的时间 ms
+
+	PHASE_TYPE GetAChanelPhase(unsigned int nIndex);
+
+	//数据，这一部分数据将保存所有的
+	//一次，二次，数据采样，有效 ，幅值，实部,虚部，相角等等
+	//得到某个时间点某个模拟通道的值
+	double GetAnalogValue(unsigned long nTime,unsigned int nIndex,ValueType valueType,ValueAttr valueAttr);
+	
+	//得到某个时间点某个数字通道的值
+	unsigned short GetDigitalValue(unsigned long nTime,unsigned int nIndex);
+
+	//得到某个时间点所有模拟通道的值
+	QVector<double> GetAValueList(unsigned long nTime,ValueType valueType,ValueAttr valueAttr);
+
+	//得到某个时间点所有数字通道的值
+	QVector<unsigned short> GetDValueList(unsigned long nTime);
+
+	//时间序列
+	QList<unsigned long> GetTimeArray();
+
+	bool	IsDChanelAct();	//是否动作
+
+	bool	IsDChanelAct(unsigned int nIndex);	//是否动作
+
+	double GetMaxAbsRawValue(unsigned int nIndex);
+
+	double GetMinRawValue(unsigned int nIndex);
+
+	double GetMaxRawValue(unsigned int nAIndex);
+
+	void SetMaxRawValue(unsigned int nIndex,double fValue);
+
+	double GetMaxValue(unsigned int nIndex,int nValueType,int nWaveType);
+
+	double GetMinValue(unsigned int nIndex,int nValueType,int nWaveType);
+
+	//某个通道的某个点的数据
+	double GetAnalogValueByIndexPoint(unsigned int nIndex,unsigned int nPoint);
+
+	unsigned short GetDigitalValueByIndexPoint(unsigned int nIndex,unsigned int nPoint);
+
+
+	//某个通道的某个点的某种类型的数据
+	bool GetTypedAnalogValueByIndexPoint(unsigned int nIndex,
+		unsigned int nPoint,int nValueType,int nWaveType,double& fValue);
+
+	//HDR
+	QDateTime		GetFaultStartTime();  //故障时间
+
+	unsigned int	GetDataFileSize();	  //数据长度
+
+	unsigned int	GetFaultKeepTime();   //故障持续时间
+
+	TripInfoList		GetTripInfoList();  
+
+	CTripInfo		GetTripInfoByTime(unsigned int,bool& bOK);
+
+	FaultInfoList		GetFaultInfoList();
+
+	DigitalStatusList	GetDigitalStatusList();
+
+	DigitalEventList	GetDigitalEventList();
+
+	CDigitalEvent  GetDigitalEventByTime(unsigned int,bool& bOK);
+
+	SettingValueList	GetSettingValueList();
+
+	//描述des
+	CAChanelDes    GetADesByIndex(unsigned int nIndex);
+
+	CDChanelDes    GetDDesByIndex(unsigned int nIndex);
+
+	CAChanelDes    GetADesByName(const QString& strName,bool& bOK);
+
+	CDChanelDes    GetDDesByName(const QString& strName,bool& bOK);
+
+	AChanelDesList GetAChanelDesList();
+
+	DChanelDesList GetDChanelDesList();
+
+
+	//中间数据 mid
+	double GetMidAnalogValue(unsigned long nTime,unsigned int nAn);
+
+	//得到某个时间点某个数字通道的值
+	unsigned short GetMidDigitalValue(unsigned long nTime,unsigned int nDn);
+
+	unsigned short GetMidDigitalValueByIndexPoint(unsigned int nIndex,unsigned int nPoint);
+
+	//得到某个时间点所有模拟通道的值
+	QVector<double> GetAMidValueList(unsigned long nTime);
+
+	//得到某个时间点所有数字通道的值
+	QVector<unsigned short> GetDMidValueList(unsigned long nTime);
+
+	bool	IsDMidChanelAct(unsigned int nIndex);	//是否动作
+
+	int GetPathNumByDesc(QString strContent,int src);
+
+};
+
+#endif
